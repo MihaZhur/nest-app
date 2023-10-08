@@ -1,4 +1,4 @@
-export enum E_Gender {
-  Male = 'm',
-  Female = 'f',
+export enum Role {
+  admin = 'ADMIN',
+  user = 'USER',
 }

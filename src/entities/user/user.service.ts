@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { genSalt, hash } from 'bcrypt';
+import { v4 as uuidv4 } from 'uuid';
 
 import { User } from './user.entity';
-import { UpdateUserDto } from './dto/updateUser.dto';
+import { ValidateUserDto } from './dto/validateUserDto';
 
 @Injectable()
 export class UserService {
@@ -12,7 +13,7 @@ export class UserService {
     @InjectRepository(User) private readonly userRepository: Repository<User>,
   ) {}
 
-  availableFields = ['nameFirst', 'nameLast', 'email', 'gender', 'birthDate'];
+  availableFields = ['userName', 'userSurname', 'email'];
 
   // Filter body's fileds from available fields list
   private filterFields(body: { [k: string]: any }) {
@@ -29,6 +30,18 @@ export class UserService {
 
   // Register new user
   public async createUser(userData: any) {
+    const existUser = await this.userRepository.findOne({
+      where: {
+        email: userData.email,
+      },
+    });
+    if (existUser) {
+      throw new BadRequestException(
+        'Пользователь с таким email уже существует',
+      );
+    }
+    const codeActivateUserEmail = uuidv4();
+
     const salt = await genSalt(10);
 
     const hashedPassword = await hash(userData.password, salt);
@@ -36,6 +49,7 @@ export class UserService {
     const newUser = this.userRepository.create({
       ...userData,
       password: hashedPassword,
+      activateCode: codeActivateUserEmail,
     });
 
     return await this.userRepository.save(newUser);
@@ -49,15 +63,15 @@ export class UserService {
   }
 
   // Get user data by id
-  public async getUserData(id: number) {
+  public async getUserData(email: string) {
     return await this.userRepository.findOne({
-      where: { id },
+      where: { email },
       select: this.availableFields as any,
     });
   }
 
   // Update user data whole
-  public async updateUserData(id: number, body: UpdateUserDto) {
+  public async updateUserData(id: number, body: ValidateUserDto) {
     return await this.userRepository.update({ id }, this.filterFields(body));
   }
 

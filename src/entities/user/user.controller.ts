@@ -13,9 +13,9 @@ import {
 import { Response, Request } from 'express';
 
 import { UserService } from './user.service';
-import { UpdateUserDto } from './dto/updateUser.dto';
+import { ValidateUserDto } from './dto/validateUserDto';
 
-@Controller('users')
+@Controller('api/users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
@@ -28,27 +28,24 @@ export class UserController {
       data: users,
     });
   }
-
-  @Get('/:id')
-  async getUser(@Param('id', ParseIntPipe) id: number, @Res() res: Response) {
-    const userData = await this.userService.getUserData(id);
-
-    return res.send({
-      status: 'ok',
-      data: userData,
-    });
-  }
-
   @Post('/')
-  async createUser(@Req() req: Request, @Res() res: Response) {
-    // await this.userService.createUser(req.body);
-    return res.send({ status: 'ok', body: req.body });
+  async createUser(
+    @Req() req: Request,
+    @Body() body: ValidateUserDto,
+    @Res() res: Response,
+  ) {
+    try {
+      const userData = await this.userService.createUser(body);
+      return res.send({ userData });
+    } catch (error) {
+      return res.send(error);
+    }
   }
 
   @Put('/:id')
   async updateUser(
     @Param('id', ParseIntPipe) id: number,
-    @Body() body: UpdateUserDto,
+    @Body() body: ValidateUserDto,
     @Res() res: Response,
   ) {
     this.userService.updateUserData(id, body);

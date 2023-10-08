@@ -1,6 +1,16 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+  Unique,
+  UpdateDateColumn,
+} from 'typeorm';
+import { Role } from './types';
 
 @Entity('users')
+@Unique(['email'])
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
@@ -11,21 +21,42 @@ export class User {
   @Column({ name: 'password', type: 'varchar' })
   password: string;
 
-  @Column({ name: 'password_conformition', type: 'varchar' })
-  passwordConformition: string;
-
-  @Column({ name: 'user_activation', type: 'boolean', default: false })
-  userActivation: string;
-
-  @Column({ name: 'user_name', type: 'varchar' })
+  @Column({ name: 'user_name', type: 'varchar', nullable: true })
   userName: string;
 
-  @Column({ name: 'user_surname', type: 'varchar' })
+  @Column({ name: 'user_surname', type: 'varchar', nullable: true })
   userSurname: string;
 
-  @Column({ name: 'user_avatar', type: 'varchar' })
+  @Column({ name: 'role', type: 'varchar', default: Role.user })
+  role: string;
+
+  @Column({ name: 'user_avatar', type: 'varchar', nullable: true })
   userAvatar: string;
 
-  @Column({ name: 'token_refresh', type: 'varchar' })
+  @Column({ name: 'token_refresh', type: 'varchar', nullable: true })
   tokenRefresh: string;
+
+  @Column({
+    name: 'email_confirmation_tokens',
+    type: 'varchar',
+    nullable: true,
+  })
+  emailConformitionToken: string;
+
+  @Column({
+    name: 'user_active',
+    type: 'boolean',
+    nullable: true,
+    default: false,
+  })
+  userActive: string;
+
+  @CreateDateColumn()
+  createdDate: Date;
+
+  @UpdateDateColumn()
+  updatedDate: Date;
+
+  @DeleteDateColumn()
+  deletedDate: Date;
 }
