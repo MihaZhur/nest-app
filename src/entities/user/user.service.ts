@@ -13,7 +13,7 @@ export class UserService {
     @InjectRepository(User) private readonly userRepository: Repository<User>,
   ) {}
 
-  availableFields = ['userName', 'userSurname', 'email'];
+  availableFields = ['role', 'userName', 'email', 'userSurname', 'id'];
 
   // Filter body's fileds from available fields list
   private filterFields(body: { [k: string]: any }) {
@@ -46,13 +46,16 @@ export class UserService {
 
     const hashedPassword = await hash(userData.password, salt);
 
-    const newUser = this.userRepository.create({
+    const userNew: User = {
       ...userData,
       password: hashedPassword,
-      activateCode: codeActivateUserEmail,
-    });
+      emailConformitionToken: codeActivateUserEmail,
+    };
 
-    return await this.userRepository.save(newUser);
+    const usersAll = this.userRepository.create(userNew);
+    await this.userRepository.save(usersAll);
+
+    return usersAll;
   }
 
   // Get all users

@@ -1,8 +1,8 @@
 import {
   Controller,
   Get,
-  Post,
-  Req,
+  // Post,
+  // Req,
   Res,
   Put,
   Delete,
@@ -10,7 +10,7 @@ import {
   ParseIntPipe,
   Body,
 } from '@nestjs/common';
-import { Response, Request } from 'express';
+import { Response } from 'express';
 
 import { UserService } from './user.service';
 import { ValidateUserDto } from './dto/validateUserDto';
@@ -28,19 +28,19 @@ export class UserController {
       data: users,
     });
   }
-  @Post('/')
-  async createUser(
-    @Req() req: Request,
-    @Body() body: ValidateUserDto,
-    @Res() res: Response,
-  ) {
-    try {
-      const userData = await this.userService.createUser(body);
-      return res.send({ userData });
-    } catch (error) {
-      return res.send(error);
-    }
-  }
+  // @Post('/')
+  // async createUser(
+  //   @Req() req: Request,
+  //   @Body() body: ValidateUserDto,
+  //   @Res() res: Response,
+  // ) {
+  //   try {
+  //     const userData = await this.userService.createUser(body);
+  //     return res.send({ userData });
+  //   } catch (error) {
+  //     return res.send(error);
+  //   }
+  // }
 
   @Put('/:id')
   async updateUser(

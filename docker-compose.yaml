@@ -5,8 +5,8 @@ services:
     container_name: nest_app_postgres
     image: postgres:14
     environment:
-      POSTGRES_USER: nest_app
-      POSTGRES_PASSWORD: nest_app
+      POSTGRES_USER: ${POSTGRES_USERNAME}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       PGDATA: /data/postgres
     volumes:
        - postgres:/var/www/nest_app/docker-volumes/postgres
@@ -20,8 +20,8 @@ services:
     container_name: nest_app_pgadmin
     image: dpage/pgadmin4
     environment:
-      PGADMIN_DEFAULT_EMAIL: nest_app@admin.com
-      PGADMIN_DEFAULT_PASSWORD: nest_app
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
       PGADMIN_CONFIG_SERVER_MODE: 'False'
     volumes:
        - pgadmin:/var/www/nest_app/docker-volumes/pgadmin

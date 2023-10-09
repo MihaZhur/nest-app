@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { AuthService } from '@entities/auth/auth.service';
 import { AuthGuard } from './auth.guard';
+
 @Controller('api/auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
@@ -23,5 +24,9 @@ export class AuthController {
   @Get('profile')
   getProfile(@Request() req) {
     return req.user;
+  }
+  @Post('signup')
+  signUp(@Body() userData: Record<string, any>) {
+    return this.authService.signUp(userData);
   }
 }
