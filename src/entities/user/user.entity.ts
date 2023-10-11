@@ -33,11 +33,8 @@ export class User {
   @Column({ name: 'user_avatar', type: 'varchar', nullable: true })
   userAvatar: string;
 
-  @Column({ name: 'token_refresh', type: 'varchar', nullable: true })
-  tokenRefresh: string;
-
   @Column({
-    name: 'email_confirmation_tokens',
+    name: 'email_confirmation_token',
     type: 'varchar',
     nullable: true,
   })
@@ -49,7 +46,7 @@ export class User {
     nullable: true,
     default: false,
   })
-  userActive: string;
+  userActive: boolean;
 
   @CreateDateColumn()
   createdDate: Date;

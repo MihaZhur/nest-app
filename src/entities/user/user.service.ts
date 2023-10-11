@@ -13,7 +13,16 @@ export class UserService {
     @InjectRepository(User) private readonly userRepository: Repository<User>,
   ) {}
 
-  availableFields = ['role', 'userName', 'email', 'userSurname', 'id'];
+  availableFields = [
+    'role',
+    'userName',
+    'email',
+    'userSurname',
+    'id',
+    'password',
+    'emailConformitionToken',
+    'userActive',
+  ];
 
   // Filter body's fileds from available fields list
   private filterFields(body: { [k: string]: any }) {
@@ -65,7 +74,7 @@ export class UserService {
     });
   }
 
-  // Get user data by id
+  // Get user auth data by email
   public async getUserData(email: string) {
     return await this.userRepository.findOne({
       where: { email },
@@ -73,9 +82,24 @@ export class UserService {
     });
   }
 
+  // Get user data by id
+  public async getUserDataById(id: number) {
+    return await this.userRepository.findOne({
+      where: { id },
+      select: this.availableFields as any,
+    });
+  }
+
   // Update user data whole
   public async updateUserData(id: number, body: ValidateUserDto) {
     return await this.userRepository.update({ id }, this.filterFields(body));
+  }
+
+  public async findOneCodeActivate(emailConformitionToken: string) {
+    return this.userRepository.findOne({
+      where: { emailConformitionToken },
+      select: this.availableFields as any,
+    });
   }
 
   // Delete user by id

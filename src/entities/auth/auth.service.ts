@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { UserService } from '@entities/user/user.service';
 import { JwtService } from '@nestjs/jwt';
-import { compare, genSalt } from 'bcrypt';
+import { compare } from 'bcrypt';
 import { User } from '@entities/user/user.entity';
 import { MailService } from 'src/mail/mail.service';
 
@@ -19,14 +19,15 @@ export class AuthService {
 
   async signIn(email: string, password: string) {
     const user = await this.userService.getUserData(email);
-    const salt = await genSalt(10);
-    const passwordVerify = compare(password, salt);
-    if (!user && !passwordVerify) {
-      throw new UnauthorizedException();
+
+    const passwordVerify = await compare(password, user.password);
+
+    if (!user || !passwordVerify) {
+      throw new UnauthorizedException('Неверный пароль или емайл');
     }
-    console.log(user);
+
     const payload = { sub: user.id, userName: user.userName, role: user.role };
-    console.log(payload);
+
     return {
       accessToken: await this.jwtService.signAsync(payload),
       userName: user.userName,
@@ -48,7 +49,27 @@ export class AuthService {
       throw new BadRequestException('Ошибка');
     } catch (err) {
       return {
-        message: 'Ошибка',
+        message: 'Неизвестная ошибка',
+      };
+    }
+  }
+  async activate(code: string) {
+    console.log(code)
+    try {
+      const user = await this.userService.findOneCodeActivate(code);
+      if (user) {
+        console.log(user);
+        user.userActive = true;
+        user.emailConformitionToken = null;
+        await this.userService.updateUserData(user.id, user);
+        return {
+          message: 'Ваш аккаунт успешно активирован!',
+        };
+      }
+      throw new BadRequestException('Ошибка');
+    } catch (err) {
+      return {
+        message: 'Неизвестная ошибка',
       };
     }
   }
