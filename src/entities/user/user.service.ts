@@ -22,6 +22,7 @@ export class UserService {
     'password',
     'emailConformitionToken',
     'userActive',
+    'refreshPassword',
   ];
 
   // Filter body's fileds from available fields list
@@ -82,6 +83,13 @@ export class UserService {
     });
   }
 
+  public async getUserDataRefreshPassword(refreshPassword: string) {
+    return await this.userRepository.findOne({
+      where: { refreshPassword },
+      select: this.availableFields as any,
+    });
+  }
+
   // Get user data by id
   public async getUserDataById(id: number) {
     return await this.userRepository.findOne({
@@ -100,6 +108,24 @@ export class UserService {
       where: { emailConformitionToken },
       select: this.availableFields as any,
     });
+  }
+
+  public async resetPassword(user: User) {
+    const codeActivateUserEmail = uuidv4();
+    user.refreshPassword = codeActivateUserEmail;
+    const id = user.id;
+    return await this.userRepository.update({ id }, this.filterFields(user));
+  }
+
+  public async changePassword(user: User) {
+    const salt = await genSalt(10);
+
+    const newHashedPassword = await hash(user.password, salt);
+
+    user.password = newHashedPassword;
+    user.refreshPassword = null;
+    const id = user.id;
+    return await this.userRepository.update({ id }, this.filterFields(user));
   }
 
   // Delete user by id

@@ -7,7 +7,7 @@ import {
   Unique,
   UpdateDateColumn,
 } from 'typeorm';
-import { Role } from './types';
+import { Role } from '@/enums/role.enum';
 
 @Entity('users')
 @Unique(['email'])
@@ -28,10 +28,13 @@ export class User {
   userSurname: string;
 
   @Column({ name: 'role', type: 'varchar', default: Role.user })
-  role: string;
+  role: Role;
 
   @Column({ name: 'user_avatar', type: 'varchar', nullable: true })
   userAvatar: string;
+
+  @Column({ name: 'refresh_password', type: 'varchar', nullable: true })
+  refreshPassword: string;
 
   @Column({
     name: 'email_confirmation_token',

@@ -2,7 +2,7 @@ import {
   Controller,
   Get,
   // Post,
-  // Req,
+  UseGuards,
   Res,
   Put,
   Delete,
@@ -10,6 +10,9 @@ import {
   ParseIntPipe,
   Body,
 } from '@nestjs/common';
+
+import { AuthAdminGuard } from '@entities/auth/auth.guard';
+
 import { Response } from 'express';
 
 import { UserService } from './user.service';
@@ -18,7 +21,7 @@ import { ValidateUserDto } from './dto/validateUserDto';
 @Controller('api/users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
-
+  @UseGuards(AuthAdminGuard)
   @Get('/')
   async getAllUsers(@Res() res: Response) {
     const users = await this.userService.getAllUsers();

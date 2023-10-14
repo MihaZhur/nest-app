@@ -54,7 +54,6 @@ export class AuthService {
     }
   }
   async activate(code: string) {
-    console.log(code)
     try {
       const user = await this.userService.findOneCodeActivate(code);
       if (user) {
@@ -71,6 +70,45 @@ export class AuthService {
       return {
         message: 'Неизвестная ошибка',
       };
+    }
+  }
+
+  async resetPassword(body: any) {
+    const user = await this.userService.getUserData(body.email);
+    if (user && !user.refreshPassword) {
+      await this.userService.resetPassword(user);
+
+      await this.mailService.sendUserRefreshPassword(
+        user,
+        user.refreshPassword,
+      );
+
+      return {
+        message: 'Вам на почту отправлено письмо для смены пароля!',
+      };
+    }
+    return {
+      message: 'Мы Уже отправляли Вам письмо о смене пароля',
+    };
+  }
+
+  async changePassword(body: any) {
+    try {
+      const user = await this.userService.getUserDataRefreshPassword(
+        body.refreshPassword,
+      );
+      console.log(body);
+
+      if (user && user.refreshPassword) {
+        user.password = body.password;
+        await this.userService.changePassword(user);
+        return {
+          message: 'Пароль успешно изменен!',
+        };
+      }
+      throw new BadRequestException('Ошибка, обновления пароля');
+    } catch (err) {
+      throw new BadRequestException(err ? err.message : 'Неизвестная ошибка');
     }
   }
 }
